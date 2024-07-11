@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -13,6 +13,12 @@ group = project.maven_group
 
 repositories {
 	maven { url = "https://maven.kyrptonaught.dev"}
+	maven { url = "https://mvn.devos.one/snapshots/" } // Create, Porting Lib, Forge Tags, Milk Lib, Registrate
+	maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // Forge Config API Port
+	maven { url = "https://jitpack.io/" } // Mixin Extras, Fabric ASM
+	maven { url = "https://maven.tterrag.com/" } // Flywheel
+	maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
+	maven { url = "https://api.modrinth.com/maven" } // LazyDFU
 }
 
 dependencies {
@@ -23,11 +29,33 @@ dependencies {
 		exclude group: "net.fabricmc.fabric-api", module: "fabric-gametest-api-v1"
 	}
 
-	//customportalapi
-	modImplementation include('net.kyrptonaught:customportalapi:test2') {
-		exclude group: "net.fabricmc.fabric-api"
-		exclude module: "sodium"
+	// Custom Portal API
+	if (new File('../customportalapi').exists()) {
+		// Local Dev - Custom Portal API
+		modImplementation include(project(':customportalapi')) {
+			exclude group: "net.fabricmc.fabric-api"
+			exclude module: "sodium"
+		}
+	} else {
+		// Remote Build - Custom Portal API
+		modImplementation include('net.kyrptonaught:customportalapi:test2') {  // include('net.kyrptonaught:customportalapi:0.0.1-beta63-1.20')
+			exclude group: "net.fabricmc.fabric-api"
+			exclude module: "sodium"
+		}
 	}
+
+	// Create Mod
+	optionalDependency("com.simibubi.create:create-fabric-${project.minecraft_version}:${project.create_version}")
+}
+
+def optionalDependency(String dep) {
+	def exclude = {
+		exclude group: "net.fabricmc.fabric-api"
+		exclude group: "net.fabricmc"
+	}
+
+	dependencies.modCompileOnly(dep, exclude)
+	//dependencies.modRuntimeOnly(dep, exclude)
 }
 
 processResources {

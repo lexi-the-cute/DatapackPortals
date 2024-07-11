@@ -8,3 +8,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+if (new File('../customportalapi').exists()) {
+    // Local Dev - Custom Portal API
+    include 'customportalapi'
+    project(':customportalapi').projectDir = new File('../customportalapi')
+}
